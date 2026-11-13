@@ -287,6 +287,16 @@ Send, and reports are deleted after 180 days.
   (or both on Tailscale), sharing is on, and you used the IP address the panel
   shows. See [troubleshooting](install/troubleshooting.md).
 
+## VoiceStudio Reader (Android)
+
+A separate Android app for listening to novels in your own voice, tuned for
+Vietnamese. Import an EPUB, then import a voice exported from VoiceStudio desktop
+(edit a voice → **Export persona**, which saves a `.ovsvoice` file). The reader clones
+it on the phone with OmniVoice, or reads with Supertonic 3's faster preset voices. It
+prepares audio ahead of where you are listening, and can prepare a whole book in
+advance. It has speed control, background music and a sleep timer. Details:
+[`mobile/android/reader/README.md`](../mobile/android/reader/README.md).
+
 ## For developers
 
 Both apps follow one contract, [`mobile/contract/SPEC.md`](../mobile/contract/SPEC.md):
