@@ -1,0 +1,6 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- An open book with a sound wave rising from its pages. -->
+    <path android:fillColor="#FFFBF4EA" android:pathData="M28,40 C36,37 46,38 53,43 L53,76 C46,71 36,70 28,73 Z" />
+    <path android:fillColor="#FFF3E2CC" android:pathData="M80,40 C72,37 62,38 55,43 L55,76 C62,71 72,70 80,73 Z" />
+    <path android:strokeColor="#FFFBF4EA" android:strokeWidth="3" android:strokeLineCap="round" android:pathData="M42,30 L42,34 M48,26 L48,34 M54,22 L54,34 M60,26 L60,34 M66,30 L66,34" />
+</vector>

@@ -28,6 +28,7 @@ datastore = { module = "androidx.datastore:datastore-preferences", version = "1.
 work = { module = "androidx.work:work-runtime-ktx", version = "2.10.0" }
 work-testing = { module = "androidx.work:work-testing", version = "2.10.0" }
 media = { module = "androidx.media3:media3-exoplayer", version = "1.8.0" }
+media-session = { module = "androidx.media3:media3-session", version = "1.8.0" }
 media-okhttp = { module = "androidx.media3:media3-datasource-okhttp", version = "1.8.0" }
 camera-core = { module = "androidx.camera:camera-core", version = "1.5.0" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version = "1.5.0" }

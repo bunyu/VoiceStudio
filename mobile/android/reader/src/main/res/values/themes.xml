@@ -1,0 +1,9 @@
+<resources>
+    <style name="ReaderTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+    <color name="paper">#FFFBF4EA</color>
+    <color name="ink">#FF3B2A1A</color>
+    <color name="accent">#FFB4552D</color>
+</resources>
