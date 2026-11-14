@@ -1,0 +1,22 @@
+[package]
+name = "reader-g2p"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+# JNI bridge to sea-g2p, the Vietnamese normaliser and phonemiser VieNeu-TTS was trained with.
+[lib]
+name = "reader_g2p"
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = { version = "0.21", default-features = false }
+# Pinned to the v0.10.0 release commit; the dictionary (sea_g2p.bin) must come from the same release.
+sea-g2p-rs = { git = "https://github.com/pnnbao97/sea-g2p", rev = "dae5ca83ea45f356c43bdb70a1bcd42e8729ff16", default-features = false, features = ["capi"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+strip = true
+panic = "unwind"

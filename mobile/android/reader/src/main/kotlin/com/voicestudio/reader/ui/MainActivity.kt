@@ -116,7 +116,7 @@ fun ReaderRoot(incoming: Uri?, consumed: () -> Unit) {
         val modifier = Modifier.padding(padding)
         when (tab) {
             Tab.LIBRARY -> LibraryScreen(modifier, importing, onOpen = { reading = it }, onImport = { uri -> scope.launch { importBook(uri) } })
-            Tab.VOICES -> VoicesScreen(modifier, voiceImport) { voiceImport = null }
+            Tab.VOICES -> VoicesScreen(modifier, voiceImport, consumed = { voiceImport = null }, onSetup = { tab = Tab.SETTINGS })
             Tab.SETTINGS -> SettingsScreen(modifier)
         }
     }

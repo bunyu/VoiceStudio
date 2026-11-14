@@ -1,0 +1,1 @@
+{"vocab": {"<pad>": 0, "<bos>": 1, "<eos>": 2, "a": 3, "b": 4, " ": 5, ".": 6, "\u2460": 7}, "bos_id": 1, "eos_id": 2, "pad_id": 0, "group": 6, "ref_max_frames": 140, "flow_fps": 15.625, "emotion_tags": {"<|emotion_1|>": "\u2460"}}

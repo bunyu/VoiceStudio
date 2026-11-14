@@ -4,6 +4,7 @@ import com.voicestudio.mobile.local.AndroidAudioDecoder
 import com.voicestudio.mobile.local.AudioDecoder
 import com.voicestudio.mobile.local.LocalAudio
 import com.voicestudio.mobile.local.PcmFile
+import com.voicestudio.reader.vieneu.NanoVoice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,9 @@ import java.io.File
 import java.util.UUID
 
 /** A voice imported from VoiceStudio: a short reference clip plus exactly what is said in it. */
-@Serializable data class ReaderVoice(val id: String, val name: String, val transcript: String, val language: String, val designed: Boolean, val importedAt: Long)
+@Serializable data class ReaderVoice(val id: String, val name: String, val transcript: String, val language: String, val designed: Boolean, val importedAt: Long,
+    /** When the voice was last enrolled for VieNeu; 0 until then. Part of the audio cache key. */
+    val enrolledAt: Long = 0)
 
 /**
  * Private voice storage. The reference is kept as 24 kHz mono PCM (what OmniVoice clones from) together with
@@ -70,6 +73,13 @@ class ReaderVoices(private val root: File, private val decoder: AudioDecoder = A
         pcm.read(0, pcm.frames.toInt())
     }
 
+    /** The enrolled voice (speaker vector, then style tokens, as little-endian floats), or null before enrolment. */
+    fun print(voice: ReaderVoice): NanoVoice? = runCatching {
+        val bytes = File(dir(voice.id), "print.f32").readBytes()
+        val floats = FloatArray(bytes.size / 4).also { java.nio.ByteBuffer.wrap(bytes).order(java.nio.ByteOrder.LITTLE_ENDIAN).asFloatBuffer().get(it) }
+        NanoVoice(floats.copyOfRange(0, SPEAKER), floats.copyOfRange(SPEAKER, floats.size), STYLE_TOKENS)
+    }.getOrNull()
+
     fun preview(voice: ReaderVoice): File? = dir(voice.id).listFiles().orEmpty().firstOrNull { it.name.startsWith("preview.") }
 
     suspend fun rename(voice: ReaderVoice, name: String, transcript: String) = withContext(Dispatchers.IO) {
@@ -79,4 +89,9 @@ class ReaderVoices(private val root: File, private val decoder: AudioDecoder = A
     }
 
     suspend fun delete(voice: ReaderVoice) = withContext(Dispatchers.IO) { dir(voice.id).deleteRecursively(); refresh() }
+
+    private companion object {
+        const val SPEAKER = 192
+        const val STYLE_TOKENS = 50
+    }
 }

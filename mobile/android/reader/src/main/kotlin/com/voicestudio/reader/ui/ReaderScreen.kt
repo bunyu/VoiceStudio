@@ -175,7 +175,7 @@ private fun Status(waiting: Boolean, readyAhead: Int, skipped: Int) {
 private fun SetupBanner(error: String, onSetup: (Tab) -> Unit) {
     val (message, tab) = when (error) {
         "voice_missing" -> R.string.error_voice_missing to Tab.VOICES
-        "omnivoice_missing", "supertonic_missing", "mobile.local.licence_required" -> R.string.error_engine_missing to Tab.SETTINGS
+        "engine_missing" -> R.string.error_engine_missing to Tab.SETTINGS
         "mobile.local.runtime_failed" -> R.string.error_runtime to Tab.SETTINGS
         else -> R.string.status_problem to null
     }
