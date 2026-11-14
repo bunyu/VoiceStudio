@@ -68,11 +68,24 @@
     <string name="pronunciations_hint">Mỗi dòng một từ: chữ viết = cách đọc. Hữu ích cho tên nhân vật và từ nước ngoài.</string>
     <string name="prepare_ahead">Chuẩn bị trước %1$d đoạn</string>
     <string name="prepare_ahead_hint">Chuẩn bị nhiều hơn thì ít bị ngắt hơn, nhưng tốn dung lượng và pin hơn.</string>
-    <string name="privacy">Sách, giọng và âm thanh chỉ nằm trên điện thoại này. Mạng chỉ dùng để tải bộ máy giọng bạn chọn.</string>
+    <string name="privacy">Sách, giọng và âm thanh chỉ nằm trên điện thoại này. Mạng chỉ dùng để tải mô hình giọng đọc.</string>
     <string name="voices_need_engine">Hãy tải mô hình giọng đọc trong mục Cài đặt để chọn giọng.</string>
     <string name="engine_about">Đọc tiếng Việt ngay trên điện thoại, không cần mạng sau khi tải.</string>
     <string name="engine_download_size">Tải về (%1$d MB)</string>
     <string name="engine_delete_confirm">Xoá mô hình giọng đọc? Âm thanh đã chuẩn bị cho sách vẫn được giữ.</string>
     <string name="fast_mode">Tạo giọng nhanh hơn</string>
     <string name="fast_mode_hint">Nhanh gấp khoảng hai lần, âm thanh hơi thô hơn. Dùng khi việc đọc bị khựng.</string>
+    <string name="voices_your">Giọng của bạn</string>
+    <string name="voices_clone_how">Nhân bản giọng từ một đoạn thu ngắn, sạch của người nói: 5 đến 10 giây, một người nói, không nhạc nền hay tiếng ồn. Giọng xuất từ VoiceStudio (.ovsvoice) cũng dùng được.</string>
+    <string name="voice_clone">Nhân bản giọng</string>
+    <string name="voice_clone_download">Lần đầu nhân bản cần tải thêm %1$d MB.</string>
+    <string name="voice_name">Tên</string>
+    <string name="voice_consent">Đây là giọng của tôi, hoặc tôi được phép dùng giọng này.</string>
+    <string name="voice_preview">Nghe đoạn thu</string>
+    <string name="voice_working">Đang học giọng…</string>
+    <string name="voice_error_short">Đoạn thu quá ngắn. Cần ít nhất 2 giây giọng nói; tốt nhất là 5 đến 10 giây.</string>
+    <string name="voice_error_silent">Không tìm thấy giọng nói trong đoạn thu.</string>
+    <string name="voice_error_audio">Không đọc được đoạn thu.</string>
+    <string name="voice_error_format">Đây không phải tệp âm thanh hay tệp giọng VoiceStudio.</string>
+    <string name="voice_error_download">Chưa tải xong phần nhân bản giọng. Hãy kiểm tra kết nối rồi thử lại.</string>
 </resources>

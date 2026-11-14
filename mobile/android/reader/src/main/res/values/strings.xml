@@ -68,11 +68,24 @@
     <string name="pronunciations_hint">One per line: written = spoken. Useful for character names and foreign words.</string>
     <string name="prepare_ahead">Prepare %1$d passages ahead</string>
     <string name="prepare_ahead_hint">More passages ahead means fewer pauses, but uses more storage and battery.</string>
-    <string name="privacy">Books, voices and audio stay on this phone. The only network use is downloading the voice engines you choose.</string>
+    <string name="privacy">Books, voices and audio stay on this phone. The only network use is downloading the voice model.</string>
     <string name="voices_need_engine">Download the voice model in Settings to choose a voice.</string>
     <string name="engine_about">Reads Vietnamese on this phone, offline once downloaded.</string>
     <string name="engine_download_size">Download (%1$d MB)</string>
     <string name="engine_delete_confirm">Delete the voice model? Audio already prepared for your books stays.</string>
     <string name="fast_mode">Faster generation</string>
     <string name="fast_mode_hint">About twice as fast, slightly rougher sound. Use it if reading stalls.</string>
+    <string name="voices_your">Your voices</string>
+    <string name="voices_clone_how">Clone a voice from a short, clean recording of someone speaking: 5 to 10 seconds, one speaker, no music or noise. A voice exported from VoiceStudio (.ovsvoice) works too.</string>
+    <string name="voice_clone">Clone a voice</string>
+    <string name="voice_clone_download">Cloning needs a %1$d MB download the first time.</string>
+    <string name="voice_name">Name</string>
+    <string name="voice_consent">This is my voice, or I have permission to use it.</string>
+    <string name="voice_preview">Listen to the recording</string>
+    <string name="voice_working">Learning the voice…</string>
+    <string name="voice_error_short">The recording is too short. Use at least 2 seconds of speech; 5 to 10 is best.</string>
+    <string name="voice_error_silent">No speech was found in the recording.</string>
+    <string name="voice_error_audio">The recording could not be read.</string>
+    <string name="voice_error_format">This is not an audio recording or a VoiceStudio voice file.</string>
+    <string name="voice_error_download">The cloning download did not finish. Check the connection and try again.</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.voicestudio.reader
 
+import com.voicestudio.reader.vieneu.EnrolmentFailed
 import com.voicestudio.reader.vieneu.NanoEngine
+import com.voicestudio.reader.vieneu.NanoEnroller
 import com.voicestudio.reader.vieneu.NanoOptions
 import com.voicestudio.reader.vieneu.NanoVoice
 import com.voicestudio.reader.vieneu.Npy
@@ -25,8 +27,25 @@ class NanoEngineTest {
     @Test fun readsNumpyArchive() {
         val arrays = Npy.readArchive(File(model, "constants.npz"))
         assertArrayEquals(intArrayOf(2, 3), arrays.getValue("null_style").shape)
-        assertEquals(4, arrays.getValue("latent_mean").data.size)   // stored as 64-bit
-        assertEquals(1f, arrays.getValue("latent_scale").data.single(), 0f)
+        assertArrayEquals(floatArrayOf(0.1f, 0f), arrays.getValue("latent_mean").data, 0f)   // stored as 64-bit
+        assertEquals(0.5f, arrays.getValue("latent_scale").data.single(), 0f)
+    }
+
+    @Test fun enrolsARecordingThroughTheThreeEncoders() = NanoEnroller(model, threads = 1).use { enroller ->
+        // Two seconds at 24 kHz, loud throughout so nothing is trimmed.
+        val clip = FloatArray(48_000) { 0.1f + 0.8f * it / 48_000 }
+        val voice = enroller.enroll(clip, 24_000)
+        assertEquals(4, voice.speaker.size)
+        assertEquals(2, voice.styleTokens)
+        // Channel 0 of the stand-in codec is the first half of the audio; grouping by six puts sample f*6+j in
+        // grouped channel j, the reference window is 78 frames, and the style is that channel's mean.
+        for (j in 0 until 6) {
+            var mean = 0.0
+            for (f in 0 until 78) mean += (clip[f * 6 + j] - 0.1f) / 2f * 0.5f
+            assertEquals((mean / 78).toFloat(), voice.style[j], 1e-5f)
+        }
+        assertEquals("silent", assertThrows(EnrolmentFailed::class.java) { enroller.enroll(FloatArray(48_000), 24_000) }.reason)
+        assertEquals("too_short", assertThrows(EnrolmentFailed::class.java) { enroller.enroll(FloatArray(24_000) { 0.3f }, 24_000) }.reason)
     }
 
     @Test fun encodesKnownSymbolsAndEmotionTags() = NanoEngine(model, threads = 1).use { engine ->

@@ -2,7 +2,9 @@ package com.voicestudio.reader.playback
 
 import android.content.Context
 import android.net.ConnectivityManager
+import com.voicestudio.mobile.local.LocalAudio
 import com.voicestudio.reader.vieneu.NanoAssets
+import com.voicestudio.reader.vieneu.NanoEnroller
 import com.voicestudio.reader.vieneu.NanoEngine
 import com.voicestudio.reader.vieneu.NanoOptions
 import com.voicestudio.reader.vieneu.NanoPresets
@@ -51,6 +53,17 @@ class VieNeu(context: Context) {
             // Stopping mid-passage is a cancellation, not a failed passage.
             catch (e: InterruptedException) { throw kotlinx.coroutines.CancellationException("cancelled") }
         }
+    }
+
+    val canClone get() = assets.installed(ReleaseFile.CLONE)
+
+    /**
+     * A recording to a voice. The three enrolment graphs are loaded for this call only, since a voice is
+     * enrolled once and they would otherwise hold memory the reading model needs.
+     */
+    suspend fun enroll(recording: LocalAudio): NanoVoice = withContext(Dispatchers.Default) {
+        check(ready && canClone) { "cloning model not installed" }
+        NanoEnroller(assets.directory).use { it.enroll(recording.samples, recording.sampleRate) }
     }
 
     /** Frees the model's memory, and its files when [delete] is set. */

@@ -289,12 +289,13 @@ Send, and reports are deleted after 180 days.
 
 ## VoiceStudio Reader (Android)
 
-A separate Android app for listening to novels in your own voice, tuned for
-Vietnamese. Import an EPUB, then import a voice exported from VoiceStudio desktop
-(edit a voice → **Export persona**, which saves a `.ovsvoice` file). The reader clones
-it on the phone with OmniVoice, or reads with Supertonic 3's faster preset voices. It
-prepares audio ahead of where you are listening, and can prepare a whole book in
-advance. It has speed control, background music and a sleep timer. Details:
+A separate Android app for listening to novels in Vietnamese. Import an EPUB, download
+the voice model once in Settings (VieNeu-TTS v3 Nano, about 350 MB), then choose one of
+its Vietnamese voices or clone a voice from a short, clean recording (5 to 10 seconds).
+A voice exported from VoiceStudio desktop (edit a voice → **Export persona**) can be
+cloned the same way. Everything runs on the phone and works offline after the download.
+The reader prepares audio ahead of where you are listening, and can prepare a whole book
+in advance. It has speed control, background music and a sleep timer. Details:
 [`mobile/android/reader/README.md`](../mobile/android/reader/README.md).
 
 ## For developers

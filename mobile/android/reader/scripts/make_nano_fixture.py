@@ -49,8 +49,25 @@ save("codec_decoder",
      [h.make_node("Reshape", ["x", "shape"], ["wav"])],
      [value("x", T.FLOAT, [1, CHANNELS, "T"])], [value("wav", T.FLOAT, [1, 1, "N"])], [shape])
 
+# Enrolment stand-ins: the speaker vector is the mean of the first four feature bins, the codec latent is the
+# audio folded into two channels, and each style value is the time-mean of one grouped channel.
+four = nh.from_array(np.array([0], np.int64), "s0"), nh.from_array(np.array([SPEAKER], np.int64), "s1"), nh.from_array(np.array([1], np.int64), "s2")
+save("speaker_encoder",
+     [h.make_node("ReduceMean", ["input"], ["m"], axes=[1], keepdims=0), h.make_node("Slice", ["m", "s0", "s1", "s2"], ["output"])],
+     [value("input", T.FLOAT, ["B", "T", 80])], [value("output", T.FLOAT, ["B", SPEAKER])], four)
+save("codec_encoder",
+     [h.make_node("Reshape", ["wav", "fold"], ["mu"])],
+     [value("wav", T.FLOAT, [1, 1, "N"])], [value("mu", T.FLOAT, [1, 2, "F"])],
+     [nh.from_array(np.array([1, 2, -1], np.int64), "fold")])
+save("reference_encoder",
+     [h.make_node("ReduceMean", ["ref"], ["m"], axes=[2], keepdims=0), h.make_node("Slice", ["m", "s0", "s1", "s2"], ["six"]),
+      h.make_node("Reshape", ["six", "grid"], ["style"])],
+     [value("ref", T.FLOAT, [1, 12, "Tr"]), value("ref_mask", T.BOOL, [1, "Tr"])], [value("style", T.FLOAT, [1, TOKENS, WIDTH])],
+     [nh.from_array(np.array([0], np.int64), "s0"), nh.from_array(np.array([6], np.int64), "s1"), nh.from_array(np.array([1], np.int64), "s2"),
+      nh.from_array(np.array([1, TOKENS, WIDTH], np.int64), "grid")])
+
 np.savez(out / "constants.npz", null_spk=np.zeros(SPEAKER, np.float32), null_style=np.zeros((TOKENS, WIDTH), np.float32),
-         latent_mean=np.zeros(4, np.float64), latent_std=np.ones(4, np.float32), latent_scale=np.float32(1.0))
+         latent_mean=np.array([0.1, 0.0], np.float64), latent_std=np.array([2.0, 1.0], np.float32), latent_scale=np.float32(0.5))
 (out / "config.json").write_text(json.dumps({
     "vocab": {"<pad>": 0, "<bos>": 1, "<eos>": 2, "a": 3, "b": 4, " ": 5, ".": 6, "①": 7}, "bos_id": 1, "eos_id": 2, "pad_id": 0,
     "group": 6, "ref_max_frames": 140, "flow_fps": 15.625, "emotion_tags": {"<|emotion_1|>": "①"},
