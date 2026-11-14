@@ -160,7 +160,13 @@ val buildNativeRuntimes by tasks.registering(Exec::class) {
     inputs.files(fileTree(nativeRoot.resolve("../mp3")) { include("*.py") })
     outputs.dir(nativeRoot.resolve("build/jniLibs"))
     outputs.dir(nativeRoot.resolve("build/assets"))
-    commandLine("bash", nativeRoot.resolve("build.sh"), "--skip-fetch")
+    // On Windows a bare "bash" resolves to WSL's System32 launcher, which cannot read a Windows path.
+    // Use Git Bash there (VOICESTUDIO_BASH overrides the location) and pass the script with forward slashes.
+    val windows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+    val shell = providers.environmentVariable("VOICESTUDIO_BASH").orNull
+        ?: listOf("C:/Program Files/Git/bin/bash.exe", "C:/Program Files (x86)/Git/bin/bash.exe").firstOrNull { windows && File(it).isFile }
+        ?: "bash"
+    commandLine(shell, nativeRoot.resolve("build.sh").invariantSeparatorsPath, "--skip-fetch")
 }
 tasks.named("preBuild") { dependsOn(buildNativeRuntimes) }
 
