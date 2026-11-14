@@ -7,16 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/** Which voice reads: a voice imported from VoiceStudio (cloned with OmniVoice) or a Supertonic preset. */
+/** Which voice reads: one of the model's own Vietnamese voices, or a voice the user cloned from a recording. */
 sealed interface VoiceChoice {
     val key: String
     data class Cloned(val id: String) : VoiceChoice { override val key get() = "clone:$id" }
-    data class Preset(val speaker: Int) : VoiceChoice { override val key get() = "preset:$speaker" }
+    data class Preset(val name: String) : VoiceChoice { override val key get() = "nano:$name" }
     companion object {
+        // Choices saved by the first version of the app ("preset:3") name voices of engines it no longer has; they fall back to the default.
         fun parse(value: String?): VoiceChoice? = when {
             value == null -> null
             value.startsWith("clone:") -> Cloned(value.removePrefix("clone:"))
-            value.startsWith("preset:") -> value.removePrefix("preset:").toIntOrNull()?.takeIf { it in 0..63 }?.let(::Preset)
+            value.startsWith("nano:") -> value.removePrefix("nano:").takeIf { it.isNotBlank() && it.length <= 80 }?.let(::Preset)
             else -> null
         }
     }
@@ -34,6 +35,8 @@ data class Settings(
     val allowMobileData: Boolean = false,
     /** How many pieces (a few sentences each) to prepare ahead of the listening position. */
     val prepareAhead: Int = 40,
+    /** Half the generation steps: about twice as fast, slightly rougher. */
+    val fast: Boolean = false,
 ) {
     fun textRules() = VietnameseText(dialect, VietnameseText.parsePronunciations(pronunciations))
 }
@@ -55,6 +58,7 @@ class ReaderSettings(context: Context) {
         pronunciations = prefs.getString("pronunciations", "").orEmpty(),
         allowMobileData = prefs.getBoolean("allowMobileData", false),
         prepareAhead = prefs.getInt("prepareAhead", 40).coerceIn(5, 400),
+        fast = prefs.getBoolean("fast", false),
     )
 
     fun update(change: (Settings) -> Settings) {
@@ -70,6 +74,7 @@ class ReaderSettings(context: Context) {
             .putString("pronunciations", next.pronunciations.take(50_000))
             .putBoolean("allowMobileData", next.allowMobileData)
             .putInt("prepareAhead", next.prepareAhead.coerceIn(5, 400))
+            .putBoolean("fast", next.fast)
             .apply()
         state.value = next
     }

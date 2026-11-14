@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
-// A separate, focused app: open a book and listen. It shares VoiceStudio's on-device engines
-// (core:local) and version, but has its own app id, storage and launcher entry.
+// A separate, focused app: open a book and listen in a Vietnamese voice. Its engine is VieNeu-TTS v3 Nano
+// on ONNX Runtime; from VoiceStudio it reuses book import, audio decoding and AAC export (core:local).
 val repository = rootDir.resolve("../..")
 val appVersion = (JsonSlurper().parse(repository.resolve("package.json")) as Map<*, *>)["version"].toString()
 val (major, minor, patch) = Regex("""(\d+)\.(\d+)\.(\d+)(?:-beta\.\d+)?""").matchEntire(appVersion)?.destructured
@@ -25,20 +25,29 @@ android {
     }
     buildFeatures { compose = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
-    // The same native runtimes the main app builds; this app only adds the model catalogue.
-    sourceSets["main"].assets.srcDir(rootDir.resolve("../native/android/build/assets"))
-    sourceSets["main"].jniLibs.srcDir(rootDir.resolve("../native/android/build/jniLibs"))
-    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/catalog"))
+    sourceSets["main"].jniLibs.srcDir(layout.buildDirectory.dir("generated/jniLibs"))
 }
 kotlin { jvmToolchain(21); compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
-val bundleCatalog by tasks.registering(Copy::class) {
-    from(repository.resolve("mobile/contract/models.json"))
+// The Vietnamese phonemiser is Rust (native/g2p). It needs rustup with the Android targets and cargo-ndk:
+//   rustup target add aarch64-linux-android x86_64-linux-android && cargo install cargo-ndk
+val g2pSource = layout.projectDirectory.dir("native/g2p")
+val buildG2p by tasks.registering(Exec::class) {
+    inputs.files(g2pSource.file("Cargo.toml"), g2pSource.file("Cargo.lock"))
+    inputs.dir(g2pSource.dir("src"))
+    val out = layout.buildDirectory.dir("generated/jniLibs")
+    outputs.dir(out)
+    workingDir = g2pSource.asFile
+    environment("ANDROID_NDK_HOME", android.ndkDirectory.absolutePath)
+    val cargo = if (org.gradle.internal.os.OperatingSystem.current().isWindows) "cargo.exe" else "cargo"
+    commandLine(cargo, "ndk", "--platform", "29", "-t", "arm64-v8a", "-t", "x86_64", "-o", out.get().asFile.absolutePath, "build", "--release", "--locked")
+}
+val bundleLicences by tasks.registering(Copy::class) {
     from(repository.resolve("LICENSE")) { into("licenses"); rename { "VoiceStudio-AGPL-3.0.txt" } }
     into(layout.buildDirectory.dir("generated/catalog"))
 }
-tasks.named("preBuild") { dependsOn(bundleCatalog, ":app:buildNativeRuntimes") }
+android.sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/catalog"))
+tasks.named("preBuild") { dependsOn(bundleLicences, buildG2p) }
 dependencies {
-    implementation(files(rootDir.resolve("../native/android/build/downloads/sherpa.aar")).builtBy(":core:local:fetchRuntimes"))
     implementation(project(":core:local"))
     implementation(libs.activity)
     implementation(libs.lifecycle)
@@ -47,10 +56,13 @@ dependencies {
     implementation(libs.serialization)
     implementation(libs.media)
     implementation(libs.media.session)
+    implementation(libs.onnxruntime.android)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
     implementation(libs.compose.material)
     implementation(libs.compose.icons)
     testImplementation(libs.junit)
+    // The same Java API as the Android runtime, so the engine port is tested off the phone.
+    testImplementation(libs.onnxruntime.jvm)
 }

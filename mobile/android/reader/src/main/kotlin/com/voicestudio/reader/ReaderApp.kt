@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.voicestudio.reader.data.Library
 import com.voicestudio.reader.data.ReaderSettings
-import com.voicestudio.reader.playback.Engines
+import com.voicestudio.reader.playback.VieNeu
 import com.voicestudio.reader.playback.Narration
 import com.voicestudio.reader.playback.Renderer
 import com.voicestudio.reader.voice.ReaderVoices
@@ -20,8 +20,8 @@ class ReaderApp : Application() {
     val settings by lazy { ReaderSettings(this) }
     val library by lazy { Library(this) }
     val voices by lazy { ReaderVoices(File(filesDir, "voices")) }
-    val engines by lazy { Engines(this) }
-    val narration by lazy { Narration(this, library, settings, Renderer(engines, voices)) }
+    val vieneu by lazy { VieNeu(this) }
+    val narration by lazy { Narration(this, library, settings, Renderer(vieneu, voices)) }
 
     override fun onCreate() {
         super.onCreate()

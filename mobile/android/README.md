@@ -64,7 +64,8 @@ in `app/build/`; no copied logo binaries are checked in.
   The six feature packages share one Gradle module to avoid six identical build
   configurations and cross-module UI plumbing.
 - `reader`: VoiceStudio Reader, a separate EPUB-listening app (`sh.voicestudio.reader`)
-  built on `core/local`, tuned for Vietnamese and voices exported from VoiceStudio.
+  for Vietnamese. It runs VieNeu-TTS v3 Nano on ONNX Runtime and reuses `core/local`
+  for book import and audio export.
   See [`reader/README.md`](reader/README.md).
 
 ## Screens and behavior

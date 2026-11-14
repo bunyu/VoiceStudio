@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -91,7 +92,8 @@ fun ReaderScreen(bookId: String, onBack: () -> Unit, onSetup: (Tab) -> Unit) {
         },
         bottomBar = {
             Surface(tonalElevation = 3.dp) {
-                Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+                // The app draws edge to edge, so the controls must stay above the system navigation bar.
+                Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp)) {
                     Status(state.waiting, state.readyAhead, state.skipped)
                     if (state.totalPieces > 0) LinearProgressIndicator(progress = { (state.piece + 1f) / state.totalPieces }, modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
@@ -173,7 +175,7 @@ private fun Status(waiting: Boolean, readyAhead: Int, skipped: Int) {
 private fun SetupBanner(error: String, onSetup: (Tab) -> Unit) {
     val (message, tab) = when (error) {
         "voice_missing" -> R.string.error_voice_missing to Tab.VOICES
-        "omnivoice_missing", "supertonic_missing", "mobile.local.licence_required" -> R.string.error_engine_missing to Tab.SETTINGS
+        "engine_missing" -> R.string.error_engine_missing to Tab.SETTINGS
         "mobile.local.runtime_failed" -> R.string.error_runtime to Tab.SETTINGS
         else -> R.string.status_problem to null
     }

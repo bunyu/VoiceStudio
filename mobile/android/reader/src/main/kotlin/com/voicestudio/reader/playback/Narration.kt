@@ -106,7 +106,7 @@ class Narration(private val context: Context, private val library: Library, priv
             }
         })
         scope.launch {
-            settings.flow.map { Triple(it.voice, it.dialect, it.pronunciations) }.distinctUntilChanged().collect {
+            settings.flow.map { listOf(it.voice, it.dialect, it.pronunciations, it.fast) }.distinctUntilChanged().collect {
                 if (book != null) { voice = null; reload(position, play = player.playWhenReady) }
             }
         }

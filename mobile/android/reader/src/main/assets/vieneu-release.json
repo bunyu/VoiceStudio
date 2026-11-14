@@ -1,0 +1,86 @@
+{
+  "id": "v3-nano-aba295eb-g2p-0.10.0",
+  "model": "VieNeu-TTS v3 Nano",
+  "licence": "Apache-2.0",
+  "credit": "VieNeu-TTS and sea-g2p by Pham Nguyen Ngoc Bao (pnnbao97)",
+  "source_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano",
+  "files": [
+    {
+      "name": "text_encoder.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/text_encoder.onnx",
+      "size": 26519943,
+      "sha256": "204f02cccae1f16ccb2d3840f05721a37fe250b82cbd456337a0ccb49615e4bf",
+      "group": "speech"
+    },
+    {
+      "name": "duration_predictor.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/duration_predictor.onnx",
+      "size": 727809,
+      "sha256": "20fd7fa60006d0a48ee82e0451b3f920d2052588c083c756cce669f3947c0a68",
+      "group": "speech"
+    },
+    {
+      "name": "vector_estimator.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/vector_estimator.onnx",
+      "size": 155132418,
+      "sha256": "c6c1d4398ca35d3ad1bd3f0459413d1b975d09e7f2f3a2b4493a7b92bbf6ce93",
+      "group": "speech"
+    },
+    {
+      "name": "codec_decoder.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/codec_decoder.onnx",
+      "size": 99319941,
+      "sha256": "b0ab15e7828a39d53679e25b1ba4ba415a61311307202a6323130b9e1cc3029d",
+      "group": "speech"
+    },
+    {
+      "name": "config.json",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/config.json",
+      "size": 2927,
+      "sha256": "3762f1716fd8d7a1451ddf2e051c03b0a341e8adda4f1dbd0db0ae9777514e56",
+      "group": "speech"
+    },
+    {
+      "name": "constants.npz",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/constants.npz",
+      "size": 53448,
+      "sha256": "7c011938effe41687a9af85107a31a040dfcf0fb3d0f048ec10f4fb65c1a8829",
+      "group": "speech"
+    },
+    {
+      "name": "sea_g2p.bin",
+      "url": "https://github.com/pnnbao97/sea-g2p/releases/download/v0.10.0/sea_g2p.bin",
+      "size": 62829820,
+      "sha256": "4346e690d0711ebc5231e7a42c5c88aaf6e40377e894b4617c018fd81c6f4096",
+      "group": "speech"
+    },
+    {
+      "name": "voices_v3_nano.json",
+      "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/22dd2ef2a89bba24a77da6dbc84c75f7f4fda05b/src/vieneu/assets/voices_v3_nano.json",
+      "size": 2316799,
+      "sha256": "2ca4cbf475409e61fda662fbd3fb3a3ac3e980bbc3925fedb4d1199c4ccac3e7",
+      "group": "speech"
+    },
+    {
+      "name": "speaker_encoder.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/speaker_encoder.onnx",
+      "size": 28303423,
+      "sha256": "a6ac6a63997761ae2997373e2ee1c47040854b4b759ea41ec48e4e42df0f4d73",
+      "group": "clone"
+    },
+    {
+      "name": "codec_encoder.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/codec_encoder.onnx",
+      "size": 56419417,
+      "sha256": "195418031f190bf1c72dbfbed8490574754b346769180209a423a96c45caab98",
+      "group": "clone"
+    },
+    {
+      "name": "reference_encoder.onnx",
+      "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/resolve/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc/reference_encoder.onnx",
+      "size": 10778145,
+      "sha256": "6746906bfe857969a2b1b6e9091f1d4a19d9f04af4e187844021272dad4dcd3a",
+      "group": "clone"
+    }
+  ]
+}

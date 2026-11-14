@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -28,23 +28,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.voicestudio.mobile.local.PhoneModel
-import com.voicestudio.mobile.network.ClientFailure
 import com.voicestudio.reader.R
 import com.voicestudio.reader.ReaderApp
 import com.voicestudio.reader.text.Dialect
+import com.voicestudio.reader.vieneu.ReleaseFile
 import kotlinx.coroutines.Job
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,8 +52,16 @@ fun SettingsScreen(modifier: Modifier) {
     Scaffold(modifier = modifier, topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_settings)) }) }) { padding ->
         LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Text(stringResource(R.string.engines), style = MaterialTheme.typography.titleMedium) }
-            item { EngineCard(app.engines.omnivoice, R.string.engine_omnivoice) }
-            item { EngineCard(app.engines.supertonic, R.string.engine_supertonic) }
+            item { EngineCard() }
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.fast_mode))
+                        Text(stringResource(R.string.fast_mode_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(settings.fast, { on -> app.settings.update { it.copy(fast = on) } })
+                }
+            }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.mobile_data), Modifier.weight(1f))
@@ -99,61 +103,44 @@ fun SettingsScreen(modifier: Modifier) {
 }
 
 @Composable
-private fun EngineCard(model: PhoneModel, description: Int) {
+private fun EngineCard() {
     val app = ReaderApp.get(LocalContext.current)
-    val engines = app.engines
-    val scope = rememberCoroutineScope()
-    val progress by engines.runtime.downloads.progress.collectAsState()
+    val vieneu = app.vieneu
     val settings by app.settings.flow.collectAsState()
-    var refresh by remember { mutableIntStateOf(0) }
+    val state by vieneu.assets.state.collectAsState()
     var job by remember { mutableStateOf<Job?>(null) }
-    var failure by remember { mutableStateOf<String?>(null) }
-    var agree by remember { mutableStateOf(false) }
-    val state = progress[model.id]
-    val installed = remember(refresh, state?.running) { engines.runtime.downloads.installed(model) }
-    val accepted = remember(refresh, state?.running) { engines.runtime.licence.accepted(model) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    val installed = remember(state.running, state.received) { vieneu.ready }
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Text(model.name, style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(description), style = MaterialTheme.typography.bodyMedium)
-            Text(stringResource(R.string.engine_size, "%.1f".format(model.totalBytes / 1e9), model.minRamGb.toInt()), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
-            if (!engines.fitsPhone(model)) Text(stringResource(R.string.engine_low_ram), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            Text(vieneu.release.model, style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.engine_about), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.engine_licence, vieneu.release.licence, vieneu.release.credit), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
             Spacer(Modifier.height(8.dp))
             when {
-                installed && accepted -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.engine_ready), Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
-                    OutlinedButton({ scope.launch { engines.runtime.downloads.delete(model); refresh++ } }) { Text(stringResource(R.string.delete)) }
-                }
-                state?.running == true -> {
+                state.running -> {
                     LinearProgressIndicator(progress = { if (state.total > 0) state.received.toFloat() / state.total else 0f }, modifier = Modifier.fillMaxWidth())
                     Text(stringResource(R.string.engine_downloading, state.received / 1_000_000, state.total / 1_000_000), style = MaterialTheme.typography.labelSmall)
-                    TextButton({ job?.cancel(); engines.runtime.downloads.paused(model.id) }) { Text(stringResource(R.string.cancel)) }
+                    TextButton({ job?.cancel() }) { Text(stringResource(R.string.cancel)) }
+                }
+                installed -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.engine_ready), Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
+                    OutlinedButton({ confirmDelete = true }) { Text(stringResource(R.string.delete)) }
                 }
                 else -> {
-                    // The model's own terms, shown before anything is downloaded.
-                    Text(stringResource(R.string.engine_licence, model.licence.id, model.licence.credit), style = MaterialTheme.typography.bodySmall)
-                    (model.licence.terms["notes"] as? JsonPrimitive)?.content?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-                    if (!accepted) Row(Modifier.clickable { agree = !agree }, verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(agree, { agree = it }); Text(stringResource(R.string.engine_agree), style = MaterialTheme.typography.bodyMedium)
-                    }
-                    Button(enabled = accepted || agree, onClick = {
-                        failure = null
-                        if (!accepted) engines.runtime.licence.record(model, true)
-                        engines.runtime.downloads.scheduled(model.id, model.totalBytes)
-                        job = app.scope.launch {
-                            try { engines.runtime.downloads.download(model, settings.allowMobileData) }
-                            catch (e: ClientFailure) { failure = e.key; engines.runtime.downloads.paused(model.id, error = e.key) }
-                            catch (e: kotlinx.coroutines.CancellationException) { throw e }
-                            catch (e: Exception) { failure = "download"; engines.runtime.downloads.paused(model.id, error = "download") }
-                            refresh++
-                        }
-                    }) { Text(stringResource(if (installed) R.string.engine_accept else R.string.engine_download)) }
-                    failure?.let {
-                        Text(stringResource(if (it == "mobile.local.wifi_required") R.string.engine_wifi else if (it == "mobile.local.storage_required") R.string.engine_storage else R.string.engine_failed),
+                    Button(onClick = {
+                        job = app.scope.launch { runCatching { vieneu.assets.download(ReleaseFile.SPEECH, settings.allowMobileData) } }
+                    }) { Text(stringResource(R.string.engine_download_size, vieneu.release.bytes(ReleaseFile.SPEECH) / 1_000_000)) }
+                    state.error?.let {
+                        Text(stringResource(when (it) { "wifi" -> R.string.engine_wifi; "storage" -> R.string.engine_storage; else -> R.string.engine_failed }),
                             color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
         }
     }
+    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false },
+        text = { Text(stringResource(R.string.engine_delete_confirm)) },
+        confirmButton = { TextButton({ confirmDelete = false; app.scope.launch { app.narration.stop(); vieneu.unload(delete = true) } }) { Text(stringResource(R.string.delete)) } },
+        dismissButton = { TextButton({ confirmDelete = false }) { Text(stringResource(R.string.cancel)) } })
 }
